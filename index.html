@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista — Le tue foto diventano un video</title>
+<meta name="description" content="Video promozionali per host Airbnb e B&amp;B, creati dalle foto che hai già. Nessun fotografo, nessun sopralluogo: mandi le foto, ricevi il video.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2311233F'/%3E%3Cpath d='M12 10l10 6-10 6z' fill='%23C2793A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#11233F;
+  --navy-2:#1B3358;
+  --ink:#141B2B;
+  --paper:#FAF7F2;
+  --paper-2:#F1ECE3;
+  --muted:#5B6472;
+  --accent:#C2793A;
+  --accent-ink:#4A2A10;
+  --line:#E4DFD3;
+  --white:#FFFFFF;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 20px 50px -22px rgba(17,35,63,.35);
+  --shadow-sm:0 8px 20px -12px rgba(17,35,63,.25);
+  --ff-display:'Space Grotesk',system-ui,sans-serif;
+  --ff-body:'Archivo',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--ff-body);color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--ff-display);line-height:1.12;letter-spacing:-.02em;margin:0}
+p{margin:0}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(194,121,58,.18)}
+.kicker{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 26px;border-radius:999px;font-weight:600;font-size:.98rem;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,background .2s ease,color .2s ease;border:1px solid transparent}
+.btn-primary{background:var(--accent);color:var(--white);box-shadow:var(--shadow-sm)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px -14px rgba(194,121,58,.55)}
+.btn-ghost{background:rgba(255,255,255,.08);color:var(--white);border-color:rgba(255,255,255,.35)}
+.btn-ghost:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.btn-dark{background:var(--navy);color:var(--white)}
+.btn-dark:hover{transform:translateY(-2px);box-shadow:0 16px 30px -16px rgba(17,35,63,.5)}
+.btn-outline{background:transparent;color:var(--navy);border-color:var(--line)}
+.btn-outline:hover{border-color:var(--navy);transform:translateY(-2px)}
+section{padding:96px 0}
+.sec-head{max-width:640px;margin:0 auto 48px;text-align:center}
+.sec-head h2{font-size:clamp(1.7rem,3.2vw,2.4rem)}
+.sec-head p{margin-top:14px;color:var(--muted);font-size:1.05rem}
+
+/* ---------- NAV ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:18px 0;transition:background .3s ease,box-shadow .3s ease,padding .3s ease}
+nav.solid{background:rgba(250,247,242,.92);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--line);padding:12px 0}
+.nav-in{display:flex;align-items:center;justify-content:space-between}
+.brand{display:inline-flex;align-items:center;line-height:0;position:relative}
+.brand .logo{height:26px;width:auto;display:block;transition:opacity .3s ease}
+.brand .logo-navy{position:absolute;left:0;top:0;opacity:0}
+nav.solid .brand .logo-white{opacity:0}
+nav.solid .brand .logo-navy{opacity:1}
+.nav-cta{padding:10px 20px;border-radius:999px;background:var(--accent);color:var(--white);font-weight:600;font-size:.92rem;transition:transform .2s ease,box-shadow .2s ease}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+
+/* ---------- HERO SCROLL-PIN ---------- */
+.hero-stage{position:relative;height:230vh}
+.hero-stage-inner{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hero-layer{position:absolute;inset:-12%;background-color:var(--navy);overflow:hidden;will-change:transform,opacity}
+/* esterno: foto con Ken Burns continuo (la casa resta viva anche da fermi) */
+.hero-kb{position:absolute;inset:-4%;background-size:cover;background-position:center;background-repeat:no-repeat;will-change:transform}
+.kb-ext{background-image:linear-gradient(180deg,rgba(17,35,63,.18),rgba(10,17,30,.5)),url('images/hero-house.jpg');animation:kenburns 28s ease-in-out infinite}
+@keyframes kenburns{0%{transform:scale(1) translate(0,0)}50%{transform:scale(1.035) translate(-0.7%,-0.5%)}100%{transform:scale(1) translate(0,0)}}
+/* interno: video reale in loop (cammino nella casa, camino acceso), rivelato scrollando */
+.hero-inside{opacity:0}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;background:var(--navy)}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,17,30,.15) 0%,rgba(10,17,30,.35) 55%,rgba(10,17,30,.72) 100%);transition:opacity .1s linear}
+.hero-copy{position:relative;z-index:2;max-width:760px;padding:0 24px;color:var(--white)}
+.hero-intro{text-align:center}
+.hero-story{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;padding:0 24px;opacity:0;pointer-events:none}
+.hero-story h2{font-size:clamp(2rem,5vw,3.6rem);color:var(--white);letter-spacing:-.02em;text-shadow:0 2px 40px rgba(10,17,30,.65),0 1px 6px rgba(10,17,30,.5)}
+.hero-copy h1{font-size:clamp(2.2rem,5.4vw,3.8rem);color:var(--white)}
+.hero-copy .accent{color:var(--accent)}
+.hero-copy p{margin-top:20px;font-size:clamp(1rem,1.6vw,1.15rem);color:rgba(255,255,255,.86);max-width:560px;margin-left:auto;margin-right:auto}
+.hero-actions{margin-top:32px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-eyebrow{color:rgba(255,255,255,.92)}
+.hero-eyebrow .dot{box-shadow:0 0 0 4px rgba(255,255,255,.16)}
+.hero-scroll-hint{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase}
+.hero-scroll-hint svg{animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@media(max-width:767px){
+  .hero-stage{height:175vh}
+  .hero-actions{flex-direction:column;align-items:stretch}
+}
+
+/* ---------- PROOF BAR ---------- */
+.proof{background:var(--navy);padding:22px 0}
+.proof-in{display:flex;align-items:center;justify-content:center;gap:clamp(18px,4vw,44px);flex-wrap:wrap;color:rgba(255,255,255,.55);font-size:.85rem}
+.proof-in .lbl{color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.04em}
+.proof-in .plogo{font-family:var(--ff-display);font-weight:600;color:rgba(255,255,255,.85);font-size:1rem}
+
+/* ---------- REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}
+.reveal.d2{transition-delay:.16s}
+
+/* ---------- PAIN / CARDS ---------- */
+.pain{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.pcard{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.pcard .ic{width:44px;height:44px;border-radius:12px;background:var(--paper-2);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:18px}
+.pcard h3{font-size:1.1rem;margin-bottom:8px}
+.pcard p{color:var(--muted);font-size:.95rem}
+.pcard.featured{background:var(--navy);border-color:var(--navy)}
+.pcard.featured h3,.pcard.featured p{color:var(--white)}
+.pcard.featured p{color:rgba(255,255,255,.75)}
+.pcard.featured .ic{background:rgba(255,255,255,.1);color:var(--accent)}
+
+/* ---------- STEPS ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;position:relative}
+.step{text-align:left}
+.step .n{width:40px;height:40px;border-radius:50%;background:var(--navy);color:var(--white);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:700;margin-bottom:16px}
+.step h3{font-size:1.1rem;margin-bottom:8px}
+.step p{color:var(--muted);font-size:.95rem}
+
+/* ---------- SAMPLE / STAGE ---------- */
+.sample-wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
+.stage{position:relative;aspect-ratio:9/14;max-width:340px;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;background:var(--navy-2)}
+.stage-photo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(17,35,63,.05),rgba(17,35,63,.4)),url('images/hero-interior.jpg') center/cover;background-color:var(--navy-2);transition:filter .9s ease,transform .9s ease}
+.stage.playing .stage-photo{filter:saturate(1.15) brightness(1.05);transform:scale(1.05)}
+.stage-tag{position:absolute;left:14px;bottom:14px;padding:6px 12px;border-radius:999px;background:rgba(10,17,30,.55);color:#fff;font-size:.78rem;font-weight:600;backdrop-filter:blur(4px);transition:opacity .4s ease}
+.stage-tag.after{opacity:0}
+.stage.playing .stage-tag{opacity:0}
+.stage.playing .stage-tag.after{opacity:1}
+.play-btn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);transition:opacity .3s ease,transform .3s ease}
+.stage.playing .play-btn{opacity:0;transform:translate(-50%,-50%) scale(.8)}
+.scanline{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0}
+.stage.playing .scanline{opacity:1;animation:scan 1.8s ease-in-out infinite}
+@keyframes scan{0%{top:0}50%{top:100%}100%{top:0}}
+.sample-copy p{color:var(--muted);margin-top:14px}
+.sample-copy ul{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:12px}
+.sample-copy li{display:flex;align-items:center;gap:10px;font-size:.95rem}
+.sample-copy li svg{flex-shrink:0;color:var(--accent)}
+@media(max-width:860px){.sample-wrap{grid-template-columns:1fr;text-align:center}.stage{margin:0 auto}.sample-copy ul{justify-items:center}}
+
+/* ---------- GALLERY ---------- */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+.thumb{aspect-ratio:9/14;border-radius:14px;background:linear-gradient(160deg,var(--navy-2),var(--navy));background-size:cover;background-position:center}
+.thumb.t1{background-image:url('images/thumb-1.jpg')}
+.thumb.t2{background-image:url('images/thumb-2.jpg')}
+.thumb.t3{background-image:url('images/thumb-3.jpg')}
+.thumb.t4{background-image:url('images/thumb-4.jpg')}
+@media(max-width:640px){.gallery{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- TESTIMONIALS ---------- */
+.testi{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tcard{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+.tcard .stars{color:var(--accent);letter-spacing:2px;margin-bottom:14px}
+.tcard blockquote{margin:0;font-size:.98rem;color:var(--ink)}
+.tcard .who{display:flex;align-items:center;gap:10px;margin-top:20px}
+.tcard .pic{width:38px;height:38px;border-radius:50%;background:var(--paper-2);flex-shrink:0}
+.tcard .name{font-weight:600;font-size:.9rem}
+.tcard .role{color:var(--muted);font-size:.82rem}
+
+/* ---------- PRICING ---------- */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+.plan{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:32px;display:flex;flex-direction:column;position:relative}
+.plan.featured{background:var(--navy);border-color:var(--navy);color:var(--white);transform:translateY(-10px);box-shadow:var(--shadow)}
+.plan .tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--white);font-size:.75rem;font-weight:700;padding:5px 14px;border-radius:999px}
+.pname{font-weight:600;color:var(--muted)}
+.plan.featured .pname{color:rgba(255,255,255,.7)}
+.cost{font-family:var(--ff-display);font-size:2.4rem;font-weight:700;margin:8px 0 22px}
+.cost small{font-size:1rem;font-weight:500;color:var(--muted)}
+.plan.featured .cost small{color:rgba(255,255,255,.6)}
+.plan ul{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:12px;flex:1}
+.plan li{display:flex;align-items:flex-start;gap:10px;font-size:.92rem}
+.plan li svg{flex-shrink:0;margin-top:2px;color:var(--accent)}
+.pbtn{display:block;text-align:center;padding:13px;border-radius:999px;font-weight:600;font-size:.92rem;transition:transform .2s ease}
+.pbtn.outline{border:1px solid var(--line);color:var(--navy)}
+.plan.featured .pbtn.outline{border-color:rgba(255,255,255,.35);color:var(--white)}
+.pbtn.solid{background:var(--accent);color:var(--white)}
+.pbtn:hover{transform:translateY(-2px)}
+@media(max-width:900px){.price-grid{grid-template-columns:1fr}.plan.featured{transform:none;order:-1}}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:760px;margin:0 auto;display:grid;gap:12px}
+.q{background:var(--white);border:1px solid var(--line);border-radius:var(--radius-sm);padding:6px 22px}
+.q summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.q summary::-webkit-details-marker{display:none}
+.q summary::after{content:'+';font-size:1.4rem;color:var(--accent);font-weight:400;flex-shrink:0}
+.q[open] summary::after{content:'–'}
+.q p{color:var(--muted);padding:0 0 18px;font-size:.95rem}
+
+/* ---------- FINAL CTA ---------- */
+.final{background:var(--navy);border-radius:28px;padding:72px 40px;text-align:center;color:var(--white);margin:0 24px}
+.final h2{color:var(--white);font-size:clamp(1.8rem,3.6vw,2.6rem)}
+.final p{color:rgba(255,255,255,.78);margin-top:14px;font-size:1.05rem}
+.final .btn{margin-top:30px}
+.guarantee{margin-top:20px;color:rgba(255,255,255,.55);font-size:.85rem}
+
+/* ---------- FOOTER ---------- */
+footer{padding:48px 0 32px;border-top:1px solid var(--line)}
+.foot-in{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;font-size:.9rem;color:var(--muted)}
+.foot-links a:hover{color:var(--navy)}
+.foot-copy{margin-top:24px;color:var(--muted);font-size:.82rem;text-align:center}
+
+@media(max-width:860px){
+  section{padding:64px 0}
+  .pain,.steps,.testi,.price-grid,.gallery{grid-template-columns:1fr}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+  .foot-in{flex-direction:column;text-align:center}
+  .final{margin:0 16px;padding:48px 24px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  .hero-stage{height:auto}
+  .hero-stage-inner{position:relative;height:88vh}
+  .hero-copy,.hero-intro{opacity:1!important;transform:none!important}
+  .hero-story{display:none}
+  .hero-media{transform:none!important;opacity:1!important}
+  .hero-inside{display:none}
+  .hero-scroll-hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="wrap nav-in">
+    <a href="#hero" class="brand" aria-label="Vista — home">
+      <img class="logo logo-white" src="images/logo-white.png" alt="Vista" width="638" height="140">
+      <img class="logo logo-navy" src="images/logo.png" alt="" aria-hidden="true" width="638" height="140">
+    </a>
+    <a href="#contatto" class="nav-cta">Richiedi il tuo video</a>
+  </div>
+</nav>
+
+<section class="hero-stage" id="hero">
+  <div class="hero-stage-inner">
+    <div class="hero-layer hero-inside" id="heroInside">
+      <video class="hero-video" id="heroVideo" muted loop playsinline preload="metadata" poster="images/hero-interior.jpg">
+        <source src="images/hero-interior.webm" type="video/webm">
+        <source src="images/hero-interior.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-layer hero-media" id="heroMedia">
+      <div class="hero-kb kb-ext"></div>
+    </div>
+    <div class="hero-scrim" id="heroScrim"></div>
+    <div class="hero-copy">
+      <div class="hero-intro" id="heroIntro">
+        <span class="eyebrow hero-eyebrow"><span class="dot"></span>Video per host Airbnb &amp; B&amp;B</span>
+        <h1>Prima di prenotare,<br>vogliono <span class="accent">vedere</span> casa tua.</h1>
+        <p>Mandi le foto che hai già dell'annuncio. Ricevi un video pronto per Instagram, il tuo sito e la piattaforma — senza fotografo, senza sopralluogo.</p>
+        <div class="hero-actions">
+          <a href="#contatto" class="btn btn-primary">Voglio il mio video</a>
+          <a href="#come" class="btn btn-ghost">Come funziona</a>
+        </div>
+      </div>
+      <div class="hero-story" id="heroStory" aria-hidden="true">
+        <h2>È qui che decidono<br>se <span class="accent">prenotare</span>.</h2>
+      </div>
+    </div>
+    <div class="hero-scroll-hint" aria-hidden="true">
+      Scorri
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<div class="proof">
+  <div class="wrap proof-in">
+    <span class="lbl">I tuoi video, pronti per</span>
+    <span class="plogo">Airbnb</span>
+    <span class="plogo">Booking</span>
+    <span class="plogo">Instagram</span>
+    <span class="plogo">TikTok</span>
+    <span class="plogo">Il tuo sito</span>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Perché un video</div>
+      <h2>Una foto si scorre. Un video si guarda.</h2>
+      <p>Chiamare un videomaker per un solo annuncio costa tempo e centinaia di euro. Vista arriva allo stesso risultato partendo dalle foto che hai già.</p>
+    </div>
+    <div class="pain">
+      <div class="pcard reveal">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2v16M6 6h5.5a2.5 2.5 0 010 5H8a2.5 2.5 0 000 5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Il videomaker costa</h3>
+        <p>Sopralluogo, riprese, montaggio: per un solo annuncio il conto non torna quasi mai.</p>
+      </div>
+      <div class="pcard reveal d1">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Non hai tempo</h3>
+        <p>Tra ospiti, pulizie e prenotazioni, montare un video da solo resta sempre l'ultima priorità.</p>
+      </div>
+      <div class="pcard featured reveal d2">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10l5 5L17 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Vista fa entrambe le cose</h3>
+        <p>Mandi le foto, ricevi il video. Veloce, curato, pronto da pubblicare ovunque.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="come" style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="kicker">Come funziona</div><h2>Tre passi. Nessuna attrezzatura.</h2></div>
+    <div class="steps">
+      <div class="step reveal"><div class="n">1</div><h3>Mandi le foto</h3><p>Le immagini che usi già per l'annuncio. Ti dico io quali funzionano meglio — bastano quelle.</p></div>
+      <div class="step reveal d1"><div class="n">2</div><h3>Creo il video</h3><p>Movimento, luce, ritmo e musica: le foto diventano una clip curata nei minimi dettagli.</p></div>
+      <div class="step reveal d2"><div class="n">3</div><h3>Ricevi e pubblichi</h3><p>Ti consegno il video nei formati per Reels, TikTok e sito. Una revisione è sempre inclusa.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sample">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="kicker">Guardalo in azione</div><h2>Ecco cosa ricevi</h2><p>Un esempio generato dalle foto di un appartamento reale. Questo è il livello che consegno.</p></div>
+    <div class="sample-wrap">
+      <div class="reveal d1">
+        <div class="stage" id="stage" role="button" tabindex="0" aria-label="Guarda la trasformazione da foto a video">
+          <div class="stage-photo"></div>
+          <div class="scanline"></div>
+          <div class="play-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 4l10 6-10 6z" fill="#11233F"/></svg>
+          </div>
+          <span class="stage-tag">La tua foto</span>
+          <span class="stage-tag after">Il tuo video</span>
+        </div>
+      </div>
+      <div class="sample-copy reveal d2">
+        <div class="kicker">In ogni video</div>
+        <h3 style="font-size:1.4rem">Non un filtro. Un vero montaggio.</h3>
+        <p>Ogni clip è costruita a mano: sequenza, ritmo, musica e call-to-action pensati per far fermare lo scroll.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Formato verticale 9:16 e orizzontale</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Musica e transizioni curate</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Testo, logo e call-to-action</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gallery reveal d2">
+      <div class="thumb t1"></div><div class="thumb t2"></div><div class="thumb t3"></div><div class="thumb t4"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="kicker">Dicono di Vista</div><h2>I primi host che l'hanno provato</h2></div>
+    <div class="testi">
+      <div class="tcard reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Ho messo il video sul profilo e le richieste sono aumentate quasi subito. La casa è la stessa, ma ora si vede davvero."</blockquote>
+        <div class="who"><div class="pic"></div><div><div class="name">Marta</div><div class="role">Host, Torino</div></div></div>
+      </div>
+      <div class="tcard reveal d1">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Pensavo servisse un budget grosso. Ho mandato le foto e in due giorni avevo un video migliore di quelli che vedo in giro."</blockquote>
+        <div class="who"><div class="pic"></div><div><div class="name">Davide</div><div class="role">B&amp;B, Cuneo</div></div></div>
+      </div>
+      <div class="tcard reveal d2">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Semplice, veloce, professionale. L'ho pubblicato anche sul sito e su Booking. Ne ho già ordinato un altro."</blockquote>
+        <div class="who"><div class="pic"></div><div><div class="name">Elena</div><div class="role">Host, Alba</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="prezzi" style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="kicker">Prezzi</div><h2>Scegli il tuo pacchetto</h2><p>Prezzi chiari, nessun abbonamento nascosto. Paghi solo quando il video ti convince.</p></div>
+    <div class="price-grid">
+      <div class="plan reveal">
+        <div class="pname">Base</div>
+        <div class="cost">39€</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 video dalle tue foto (fino a 15s)</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Formato verticale 9:16</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Musica e transizioni curate</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 revisione inclusa</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Prima bozza in 48h</li>
+        </ul>
+        <a href="#contatto" class="pbtn outline">Inizia da qui</a>
+      </div>
+      <div class="plan featured reveal d1">
+        <div class="tag">Più richiesto</div>
+        <div class="pname">Struttura</div>
+        <div class="cost">79€</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Video fino a 30s</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Verticale + orizzontale</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Testo, logo e call-to-action</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>2 revisioni incluse</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Consegna prioritaria in 24h</li>
+        </ul>
+        <a href="#contatto" class="pbtn solid">Scegli Struttura</a>
+      </div>
+      <div class="plan reveal d2">
+        <div class="pname">Stagione</div>
+        <div class="cost">199€<small>/mese</small></div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>4 video al mese</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Tutti i formati social</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Contenuti pensati per la stagionalità</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Revisioni illimitate</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priorità assoluta</li>
+        </ul>
+        <a href="#contatto" class="pbtn outline">Parliamone</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="kicker">Domande</div><h2>Quello che chiedono di più</h2></div>
+    <div class="faq reveal d1">
+      <details class="q" open><summary>Che foto devo mandare?<span></span></summary><p>Quelle che hai già usato per l'annuncio. Più sono luminose e ordinate, meglio è — ma non serve un fotografo. Ti dico io quali funzionano meglio prima di iniziare.</p></details>
+      <details class="q"><summary>Dove posso pubblicare il video?</summary><p>Instagram e TikTok (verticale), il tuo sito, Facebook, WhatsApp e Booking. Ti consegno più formati così sei coperto ovunque.</p></details>
+      <details class="q"><summary>Quanto ci vuole?</summary><p>La prima bozza arriva entro 48 ore da quando ricevo le foto. Con il pacchetto Struttura, entro 24 ore.</p></details>
+      <details class="q"><summary>E se non mi piace?</summary><p>Ogni pacchetto include almeno una revisione. Modifichiamo musica, ritmo o inquadrature finché non ti rappresenta. Paghi solo dopo aver approvato.</p></details>
+      <details class="q"><summary>Come pago?</summary><p>Solo dopo aver approvato la bozza. Bonifico, PayPal o carta — come preferisci.</p></details>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="final reveal" id="contatto">
+    <h2>Il tuo prossimo ospite<br>guarda prima di prenotare.</h2>
+    <p>Mandami le foto oggi. Ricevi la prima bozza entro 48 ore — e paghi solo se ti convince.</p>
+    <a href="https://wa.me/39XXXXXXXXXX?text=Ciao%20Vista%2C%20vorrei%20un%20video%20per%20il%20mio%20annuncio" class="btn btn-primary">Scrivimi su WhatsApp</a>
+    <div class="guarantee">Nessun anticipo · Prima bozza senza impegno · Revisione inclusa</div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-in">
+      <a href="#hero" class="brand" aria-label="Vista — home">
+        <img src="images/logo.png" alt="Vista" width="638" height="140" style="height:30px;width:auto;display:block">
+      </a>
+      <div class="foot-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="termini.html">Termini e condizioni</a>
+        <a href="cookie.html">Cookie</a>
+        <a href="#contatto">Contatti</a>
+      </div>
+    </div>
+    <div class="foot-copy">© 2026 Vista · Video promozionali per host Airbnb &amp; B&amp;B · Cuneo, Italia · P.IVA da inserire</div>
+  </div>
+</footer>
+
+<script>
+// nav: diventa solida dopo un po' di scroll
+(function(){
+  var nav=document.getElementById('nav');
+  function onScroll(){ nav.classList.toggle('solid', window.scrollY>40); }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+})();
+
+// hero: effetto "si entra in casa" — l'esterno spinge in avanti e sfuma,
+// l'interno viene rivelato dietro. Pinned via position:sticky.
+(function(){
+  var wrap=document.getElementById('hero');
+  var media=document.getElementById('heroMedia');
+  var inside=document.getElementById('heroInside');
+  var scrim=document.getElementById('heroScrim');
+  var intro=document.getElementById('heroIntro');
+  var story=document.getElementById('heroStory');
+  var video=document.getElementById('heroVideo');
+  if(!wrap||!media) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    if(intro) intro.style.opacity=1;
+    return; // il video resta fermo sul poster, nessun autoplay
+  }
+  // video interno: parte in loop muto, in pausa quando esce dal viewport (batteria/perf)
+  if(video){
+    var playP=video.play();
+    if(playP&&playP.catch) playP.catch(function(){});
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){ var p=video.play(); if(p&&p.catch) p.catch(function(){}); }
+          else video.pause();
+        });
+      },{threshold:.05}).observe(wrap);
+    }
+  }
+  function clamp(v){ return v<0?0:(v>1?1:v); }
+  var ticking=false;
+  function update(){
+    var rect=wrap.getBoundingClientRect();
+    var total=wrap.offsetHeight-window.innerHeight;
+    var progress=total>0?clamp(-rect.top/total):0;
+
+    // fase 1 (0 -> ~0.6): la camera spinge dentro la porta dell'esterno
+    var enter=clamp(progress/0.62);
+    // esterno: zoom IN (avvicinamento) e sfumatura, come attraversando l'ingresso
+    var extScale=1.06+enter*0.9;
+    var extOpacity=1-clamp((enter-0.35)/0.5);
+    media.style.transform='scale('+extScale.toFixed(3)+')';
+    media.style.opacity=extOpacity.toFixed(3);
+
+    // interno: già "dentro", si assesta da leggermente ingrandito a normale
+    if(inside){
+      var inScale=1.28-enter*0.28;
+      var inOpacity=clamp((enter-0.15)/0.45);
+      inside.style.transform='scale('+inScale.toFixed(3)+')';
+      inside.style.opacity=inOpacity.toFixed(3);
+    }
+
+    scrim.style.opacity=(0.34+progress*0.34).toFixed(2);
+
+    // la headline racconta: l'intro sfuma appena si varca la soglia...
+    var introFade=progress<0.28?0:clamp((progress-0.28)/0.32);
+    intro.style.opacity=(1-introFade).toFixed(2);
+    intro.style.transform='translate3d(0,'+(-36*introFade).toFixed(1)+'px,0)';
+    intro.style.pointerEvents=introFade>0.9?'none':'auto';
+    // ...e la frase-storia compare lentamente quando sei dentro
+    if(story){
+      var storyIn=clamp((progress-0.5)/0.32);
+      story.style.opacity=storyIn.toFixed(2);
+      story.style.transform='translateY(-50%) translate3d(0,'+(18*(1-storyIn)).toFixed(1)+'px,0)';
+    }
+    ticking=false;
+  }
+  function onScroll(){ if(!ticking){ requestAnimationFrame(update); ticking=true; } }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  update();
+})();
+
+// sample stage: click/tastiera per mostrare il "prima/dopo"
+(function(){
+  var s=document.getElementById('stage');
+  if(!s) return;
+  function t(){ s.classList.toggle('playing'); }
+  s.addEventListener('click',t);
+  s.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); t(); } });
+})();
+
+// reveal on scroll
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('in')}); return; }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  },{threshold:.15});
+  els.forEach(function(e){ io.observe(e); });
+})();
+</script>
+</body>
+</html>
