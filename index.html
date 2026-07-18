@@ -58,16 +58,22 @@ section{padding:96px 0}
 nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:18px 0;transition:background .3s ease,box-shadow .3s ease,padding .3s ease}
 nav.solid{background:rgba(250,247,242,.92);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--line);padding:12px 0}
 .nav-in{display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--ff-display);font-weight:700;font-size:1.15rem;color:var(--white);transition:color .3s ease}
-nav.solid .brand{color:var(--navy)}
-.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand{display:inline-flex;align-items:center;line-height:0;position:relative}
+.brand .logo{height:26px;width:auto;display:block;transition:opacity .3s ease}
+.brand .logo-navy{position:absolute;left:0;top:0;opacity:0}
+nav.solid .brand .logo-white{opacity:0}
+nav.solid .brand .logo-navy{opacity:1}
 .nav-cta{padding:10px 20px;border-radius:999px;background:var(--accent);color:var(--white);font-weight:600;font-size:.92rem;transition:transform .2s ease,box-shadow .2s ease}
 .nav-cta:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
 
 /* ---------- HERO SCROLL-PIN ---------- */
 .hero-stage{position:relative;height:230vh}
 .hero-stage-inner{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.hero-media{position:absolute;inset:-12%;background:linear-gradient(180deg,rgba(17,35,63,.18),rgba(10,17,30,.55)),url('images/hero-house.jpg') center/cover no-repeat;background-color:var(--navy);will-change:transform}
+.hero-layer{position:absolute;inset:-12%;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:var(--navy);will-change:transform,opacity}
+/* interno: dietro, parte ingrandito, viene rivelato scrollando (effetto "si entra in casa") */
+.hero-inside{background-image:url('images/hero-inside.jpg');opacity:0}
+/* esterno: davanti, spinge in avanti e sfuma come attraversando la porta */
+.hero-media{background-image:linear-gradient(180deg,rgba(17,35,63,.18),rgba(10,17,30,.5)),url('images/hero-house.jpg')}
 .hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,17,30,.15) 0%,rgba(10,17,30,.35) 55%,rgba(10,17,30,.72) 100%);transition:opacity .1s linear}
 .hero-copy{position:relative;z-index:2;max-width:760px;text-align:center;padding:0 24px;color:var(--white)}
 .hero-copy h1{font-size:clamp(2.2rem,5.4vw,3.8rem);color:var(--white)}
@@ -219,19 +225,18 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
 
 <nav id="nav">
   <div class="wrap nav-in">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 3l9 5-9 5z" fill="#C2793A"/></svg>
-      </span>
-      Vista
-    </div>
+    <a href="#hero" class="brand" aria-label="Vista — home">
+      <img class="logo logo-white" src="images/logo-white.png" alt="Vista" width="638" height="140">
+      <img class="logo logo-navy" src="images/logo.png" alt="" aria-hidden="true" width="638" height="140">
+    </a>
     <a href="#contatto" class="nav-cta">Richiedi il tuo video</a>
   </div>
 </nav>
 
 <section class="hero-stage" id="hero">
   <div class="hero-stage-inner">
-    <div class="hero-media" id="heroMedia"></div>
+    <div class="hero-layer hero-inside" id="heroInside"></div>
+    <div class="hero-layer hero-media" id="heroMedia"></div>
     <div class="hero-scrim" id="heroScrim"></div>
     <div class="hero-copy" id="heroCopy">
       <span class="eyebrow hero-eyebrow"><span class="dot"></span>Video per host Airbnb &amp; B&amp;B</span>
@@ -423,10 +428,9 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
 <footer>
   <div class="wrap">
     <div class="foot-in">
-      <div class="brand" style="color:var(--navy)">
-        <span class="brand-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 3l9 5-9 5z" fill="#C2793A"/></svg></span>
-        Vista
-      </div>
+      <a href="#hero" class="brand" aria-label="Vista — home">
+        <img src="images/logo.png" alt="Vista" width="638" height="140" style="height:30px;width:auto;display:block">
+      </a>
       <div class="foot-links">
         <a href="privacy.html">Privacy</a>
         <a href="termini.html">Termini e condizioni</a>
@@ -447,10 +451,12 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
   onScroll();
 })();
 
-// hero: immagine pinned via position:sticky, animata in base al progresso di scroll
+// hero: effetto "si entra in casa" — l'esterno spinge in avanti e sfuma,
+// l'interno viene rivelato dietro. Pinned via position:sticky.
 (function(){
   var wrap=document.getElementById('hero');
   var media=document.getElementById('heroMedia');
+  var inside=document.getElementById('heroInside');
   var scrim=document.getElementById('heroScrim');
   var copy=document.getElementById('heroCopy');
   if(!wrap||!media) return;
@@ -458,20 +464,36 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
     copy.style.opacity=1;
     return;
   }
+  function clamp(v){ return v<0?0:(v>1?1:v); }
   var ticking=false;
   function update(){
     var rect=wrap.getBoundingClientRect();
     var total=wrap.offsetHeight-window.innerHeight;
-    var progress=total>0?Math.min(1,Math.max(0,-rect.top/total)):0;
-    var scale=1.16-progress*0.16;
-    var pan=-3+progress*3;
-    media.style.transform='scale('+scale.toFixed(3)+') translate3d(0,'+pan.toFixed(2)+'%,0)';
-    scrim.style.opacity=(0.35+progress*0.4).toFixed(2);
-    // titolo visibile subito, poi sfuma man mano che l'immagine si "posa"
-    var fade=progress<0.4?0:Math.min(1,(progress-0.4)/0.45);
+    var progress=total>0?clamp(-rect.top/total):0;
+
+    // fase 1 (0 -> ~0.6): la camera spinge dentro la porta dell'esterno
+    var enter=clamp(progress/0.62);
+    // esterno: zoom IN (avvicinamento) e sfumatura, come attraversando l'ingresso
+    var extScale=1.06+enter*0.9;
+    var extOpacity=1-clamp((enter-0.35)/0.5);
+    media.style.transform='scale('+extScale.toFixed(3)+')';
+    media.style.opacity=extOpacity.toFixed(3);
+
+    // interno: già "dentro", si assesta da leggermente ingrandito a normale
+    if(inside){
+      var inScale=1.28-enter*0.28;
+      var inOpacity=clamp((enter-0.15)/0.45);
+      inside.style.transform='scale('+inScale.toFixed(3)+')';
+      inside.style.opacity=inOpacity.toFixed(3);
+    }
+
+    scrim.style.opacity=(0.34+progress*0.34).toFixed(2);
+
+    // titolo visibile subito, poi sfuma appena si varca la soglia
+    var fade=progress<0.32?0:clamp((progress-0.32)/0.4);
     var cp=1-fade;
     copy.style.opacity=cp.toFixed(2);
-    copy.style.transform='translate3d(0,'+(-30*fade).toFixed(1)+'px,0)';
+    copy.style.transform='translate3d(0,'+(-34*fade).toFixed(1)+'px,0)';
     ticking=false;
   }
   function onScroll(){ if(!ticking){ requestAnimationFrame(update); ticking=true; } }
