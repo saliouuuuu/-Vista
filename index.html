@@ -69,13 +69,22 @@ nav.solid .brand .logo-navy{opacity:1}
 /* ---------- HERO SCROLL-PIN ---------- */
 .hero-stage{position:relative;height:230vh}
 .hero-stage-inner{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.hero-layer{position:absolute;inset:-12%;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:var(--navy);will-change:transform,opacity}
+.hero-layer{position:absolute;inset:-12%;background-color:var(--navy);overflow:hidden;will-change:transform,opacity}
+/* la foto vive su un figlio: lo scroll muove il layer, il Ken Burns muove il figlio (si compongono) */
+.hero-kb{position:absolute;inset:-4%;background-size:cover;background-position:center;background-repeat:no-repeat;will-change:transform}
+.kb-inside{background-image:url('images/hero-inside.jpg');animation:kenburns 22s ease-in-out infinite}
+.kb-ext{background-image:linear-gradient(180deg,rgba(17,35,63,.18),rgba(10,17,30,.5)),url('images/hero-house.jpg');animation:kenburns 28s ease-in-out infinite}
+@keyframes kenburns{0%{transform:scale(1) translate(0,0)}50%{transform:scale(1.035) translate(-0.7%,-0.5%)}100%{transform:scale(1) translate(0,0)}}
 /* interno: dietro, parte ingrandito, viene rivelato scrollando (effetto "si entra in casa") */
-.hero-inside{background-image:url('images/hero-inside.jpg');opacity:0}
-/* esterno: davanti, spinge in avanti e sfuma come attraversando la porta */
-.hero-media{background-image:linear-gradient(180deg,rgba(17,35,63,.18),rgba(10,17,30,.5)),url('images/hero-house.jpg')}
+.hero-inside{opacity:0}
+/* bagliore del camino che pulsa quando sei dentro (vive nel layer interno, appare con esso) */
+.hero-fire{position:absolute;right:6%;top:38%;width:32%;height:30%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,158,66,.55),rgba(255,120,40,.18) 45%,transparent 72%);filter:blur(14px);mix-blend-mode:screen;animation:flicker 4.2s ease-in-out infinite;pointer-events:none}
+@keyframes flicker{0%,100%{opacity:.55;transform:scale(1)}30%{opacity:.82;transform:scale(1.04)}55%{opacity:.44;transform:scale(.98)}78%{opacity:.7;transform:scale(1.02)}}
 .hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,17,30,.15) 0%,rgba(10,17,30,.35) 55%,rgba(10,17,30,.72) 100%);transition:opacity .1s linear}
-.hero-copy{position:relative;z-index:2;max-width:760px;text-align:center;padding:0 24px;color:var(--white)}
+.hero-copy{position:relative;z-index:2;max-width:760px;padding:0 24px;color:var(--white)}
+.hero-intro{text-align:center}
+.hero-story{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;padding:0 24px;opacity:0;pointer-events:none}
+.hero-story h2{font-size:clamp(2rem,5vw,3.6rem);color:var(--white);letter-spacing:-.02em;text-shadow:0 2px 40px rgba(10,17,30,.65),0 1px 6px rgba(10,17,30,.5)}
 .hero-copy h1{font-size:clamp(2.2rem,5.4vw,3.8rem);color:var(--white)}
 .hero-copy .accent{color:var(--accent)}
 .hero-copy p{margin-top:20px;font-size:clamp(1rem,1.6vw,1.15rem);color:rgba(255,255,255,.86);max-width:560px;margin-left:auto;margin-right:auto}
@@ -215,8 +224,10 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
   .reveal{opacity:1;transform:none}
   .hero-stage{height:auto}
   .hero-stage-inner{position:relative;height:88vh}
-  .hero-copy{opacity:1!important;transform:none!important}
-  .hero-media{transform:none!important}
+  .hero-copy,.hero-intro{opacity:1!important;transform:none!important}
+  .hero-story{display:none}
+  .hero-media{transform:none!important;opacity:1!important}
+  .hero-inside{display:none}
   .hero-scroll-hint{display:none}
 }
 </style>
@@ -235,16 +246,26 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
 
 <section class="hero-stage" id="hero">
   <div class="hero-stage-inner">
-    <div class="hero-layer hero-inside" id="heroInside"></div>
-    <div class="hero-layer hero-media" id="heroMedia"></div>
+    <div class="hero-layer hero-inside" id="heroInside">
+      <div class="hero-kb kb-inside"></div>
+      <div class="hero-fire" aria-hidden="true"></div>
+    </div>
+    <div class="hero-layer hero-media" id="heroMedia">
+      <div class="hero-kb kb-ext"></div>
+    </div>
     <div class="hero-scrim" id="heroScrim"></div>
-    <div class="hero-copy" id="heroCopy">
-      <span class="eyebrow hero-eyebrow"><span class="dot"></span>Video per host Airbnb &amp; B&amp;B</span>
-      <h1>Prima di prenotare,<br>vogliono <span class="accent">vedere</span> casa tua.</h1>
-      <p>Mandi le foto che hai già dell'annuncio. Ricevi un video pronto per Instagram, il tuo sito e la piattaforma — senza fotografo, senza sopralluogo.</p>
-      <div class="hero-actions">
-        <a href="#contatto" class="btn btn-primary">Voglio il mio video</a>
-        <a href="#come" class="btn btn-ghost">Come funziona</a>
+    <div class="hero-copy">
+      <div class="hero-intro" id="heroIntro">
+        <span class="eyebrow hero-eyebrow"><span class="dot"></span>Video per host Airbnb &amp; B&amp;B</span>
+        <h1>Prima di prenotare,<br>vogliono <span class="accent">vedere</span> casa tua.</h1>
+        <p>Mandi le foto che hai già dell'annuncio. Ricevi un video pronto per Instagram, il tuo sito e la piattaforma — senza fotografo, senza sopralluogo.</p>
+        <div class="hero-actions">
+          <a href="#contatto" class="btn btn-primary">Voglio il mio video</a>
+          <a href="#come" class="btn btn-ghost">Come funziona</a>
+        </div>
+      </div>
+      <div class="hero-story" id="heroStory" aria-hidden="true">
+        <h2>È qui che decidono<br>se <span class="accent">prenotare</span>.</h2>
       </div>
     </div>
     <div class="hero-scroll-hint" aria-hidden="true">
@@ -458,10 +479,11 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
   var media=document.getElementById('heroMedia');
   var inside=document.getElementById('heroInside');
   var scrim=document.getElementById('heroScrim');
-  var copy=document.getElementById('heroCopy');
+  var intro=document.getElementById('heroIntro');
+  var story=document.getElementById('heroStory');
   if(!wrap||!media) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    copy.style.opacity=1;
+    if(intro) intro.style.opacity=1;
     return;
   }
   function clamp(v){ return v<0?0:(v>1?1:v); }
@@ -489,11 +511,17 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
 
     scrim.style.opacity=(0.34+progress*0.34).toFixed(2);
 
-    // titolo visibile subito, poi sfuma appena si varca la soglia
-    var fade=progress<0.32?0:clamp((progress-0.32)/0.4);
-    var cp=1-fade;
-    copy.style.opacity=cp.toFixed(2);
-    copy.style.transform='translate3d(0,'+(-34*fade).toFixed(1)+'px,0)';
+    // la headline racconta: l'intro sfuma appena si varca la soglia...
+    var introFade=progress<0.28?0:clamp((progress-0.28)/0.32);
+    intro.style.opacity=(1-introFade).toFixed(2);
+    intro.style.transform='translate3d(0,'+(-36*introFade).toFixed(1)+'px,0)';
+    intro.style.pointerEvents=introFade>0.9?'none':'auto';
+    // ...e la frase-storia compare lentamente quando sei dentro
+    if(story){
+      var storyIn=clamp((progress-0.5)/0.32);
+      story.style.opacity=storyIn.toFixed(2);
+      story.style.transform='translateY(-50%) translate3d(0,'+(18*(1-storyIn)).toFixed(1)+'px,0)';
+    }
     ticking=false;
   }
   function onScroll(){ if(!ticking){ requestAnimationFrame(update); ticking=true; } }
