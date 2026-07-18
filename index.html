@@ -70,16 +70,13 @@ nav.solid .brand .logo-navy{opacity:1}
 .hero-stage{position:relative;height:230vh}
 .hero-stage-inner{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .hero-layer{position:absolute;inset:-12%;background-color:var(--navy);overflow:hidden;will-change:transform,opacity}
-/* la foto vive su un figlio: lo scroll muove il layer, il Ken Burns muove il figlio (si compongono) */
+/* esterno: foto con Ken Burns continuo (la casa resta viva anche da fermi) */
 .hero-kb{position:absolute;inset:-4%;background-size:cover;background-position:center;background-repeat:no-repeat;will-change:transform}
-.kb-inside{background-image:url('images/hero-inside.jpg');animation:kenburns 22s ease-in-out infinite}
 .kb-ext{background-image:linear-gradient(180deg,rgba(17,35,63,.18),rgba(10,17,30,.5)),url('images/hero-house.jpg');animation:kenburns 28s ease-in-out infinite}
 @keyframes kenburns{0%{transform:scale(1) translate(0,0)}50%{transform:scale(1.035) translate(-0.7%,-0.5%)}100%{transform:scale(1) translate(0,0)}}
-/* interno: dietro, parte ingrandito, viene rivelato scrollando (effetto "si entra in casa") */
+/* interno: video reale in loop (cammino nella casa, camino acceso), rivelato scrollando */
 .hero-inside{opacity:0}
-/* bagliore del camino che pulsa quando sei dentro (vive nel layer interno, appare con esso) */
-.hero-fire{position:absolute;right:6%;top:38%;width:32%;height:30%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,158,66,.55),rgba(255,120,40,.18) 45%,transparent 72%);filter:blur(14px);mix-blend-mode:screen;animation:flicker 4.2s ease-in-out infinite;pointer-events:none}
-@keyframes flicker{0%,100%{opacity:.55;transform:scale(1)}30%{opacity:.82;transform:scale(1.04)}55%{opacity:.44;transform:scale(.98)}78%{opacity:.7;transform:scale(1.02)}}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;background:var(--navy)}
 .hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,17,30,.15) 0%,rgba(10,17,30,.35) 55%,rgba(10,17,30,.72) 100%);transition:opacity .1s linear}
 .hero-copy{position:relative;z-index:2;max-width:760px;padding:0 24px;color:var(--white)}
 .hero-intro{text-align:center}
@@ -247,8 +244,10 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
 <section class="hero-stage" id="hero">
   <div class="hero-stage-inner">
     <div class="hero-layer hero-inside" id="heroInside">
-      <div class="hero-kb kb-inside"></div>
-      <div class="hero-fire" aria-hidden="true"></div>
+      <video class="hero-video" id="heroVideo" muted loop playsinline preload="metadata" poster="images/hero-interior.jpg">
+        <source src="images/hero-interior.webm" type="video/webm">
+        <source src="images/hero-interior.mp4" type="video/mp4">
+      </video>
     </div>
     <div class="hero-layer hero-media" id="heroMedia">
       <div class="hero-kb kb-ext"></div>
@@ -481,10 +480,24 @@ footer{padding:48px 0 32px;border-top:1px solid var(--line)}
   var scrim=document.getElementById('heroScrim');
   var intro=document.getElementById('heroIntro');
   var story=document.getElementById('heroStory');
+  var video=document.getElementById('heroVideo');
   if(!wrap||!media) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     if(intro) intro.style.opacity=1;
-    return;
+    return; // il video resta fermo sul poster, nessun autoplay
+  }
+  // video interno: parte in loop muto, in pausa quando esce dal viewport (batteria/perf)
+  if(video){
+    var playP=video.play();
+    if(playP&&playP.catch) playP.catch(function(){});
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){ var p=video.play(); if(p&&p.catch) p.catch(function(){}); }
+          else video.pause();
+        });
+      },{threshold:.05}).observe(wrap);
+    }
   }
   function clamp(v){ return v<0?0:(v>1?1:v); }
   var ticking=false;
