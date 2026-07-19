@@ -3,5 +3,6 @@ Allow: /
 Disallow: /privacy.html
 Disallow: /termini.html
 Disallow: /cookie.html
+Disallow: /spot.html
 
 Sitemap: https://vistabnb.site/sitemap.xml

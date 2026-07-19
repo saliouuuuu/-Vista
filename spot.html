@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista BnB — Spot storyboard</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2EDE6;
+  --ink:#12100E;
+  --leather:#8A6A4B;
+  --glass:rgba(255,255,255,0.08);
+  --hairline:rgba(18,16,14,0.10);
+  --ff-display:'Archivo',system-ui,sans-serif;
+  --ff-ui:'Inter',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--ff-ui);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:32px 16px;
+  gap:28px;
+  overflow-x:hidden;
+}
+
+/* ---------- SCENE ---------- */
+.scene{position:relative;width:900px;max-width:92vw}
+
+.device{
+  position:relative;
+  width:100%;
+  aspect-ratio:4/3;
+  border-radius:28px;
+  border:10px solid var(--ink);
+  box-shadow:0 40px 80px -20px rgba(18,16,14,0.28);
+  background:#fff;
+  overflow:hidden;
+  transform-origin:center center;
+}
+.device-inner{position:absolute;inset:0;display:flex;flex-direction:column}
+
+/* topbar: static, never animated */
+.topbar{
+  flex:0 0 auto;
+  height:11%;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 5%;
+  border-bottom:1px solid var(--hairline);
+}
+.search-field{
+  display:flex;align-items:center;gap:8px;
+  font:500 13px/1 var(--ff-ui);
+  letter-spacing:.01em;
+  color:var(--ink);
+  opacity:.82;
+}
+.search-field svg{flex:0 0 auto;opacity:.55}
+.filter-btn{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--hairline);background:transparent;
+}
+.filter-btn svg{opacity:.55}
+
+/* scrollable listing grid */
+.grid-viewport{position:relative;flex:1;overflow:hidden}
+.grid{
+  position:absolute;
+  left:0;right:0;top:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4.4% 3.6%;
+  padding:4.4% 5%;
+  will-change:transform;
+}
+.card{display:flex;flex-direction:column;gap:8px}
+.thumb{
+  position:relative;
+  aspect-ratio:16/10;
+  border-radius:12px;
+  background-size:220% 220%;
+  background-position:0% 0%;
+  filter:saturate(.55);
+  transition:filter .5s ease;
+}
+.thumb[data-palette="stone"],#expandClone[data-palette="stone"]{background-image:linear-gradient(135deg,#a89c8a,#cfc6b6 45%,#8f8672)}
+.thumb[data-palette="olive"],#expandClone[data-palette="olive"]{background-image:linear-gradient(135deg,#8a8f6d,#bcc296 45%,#6f7456)}
+.thumb[data-palette="sand"],#expandClone[data-palette="sand"]{background-image:linear-gradient(135deg,#c9ad84,#e6d0a8 45%,#a9835c)}
+.thumb.is-live{
+  filter:saturate(1.05);
+  animation:thumbPan 8s linear infinite, thumbPulse 8s ease-in-out infinite;
+}
+@keyframes thumbPan{
+  0%{background-position:0% 0%}
+  50%{background-position:100% 60%}
+  100%{background-position:0% 0%}
+}
+@keyframes thumbPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
+.card-info{
+  padding-top:8px;
+  border-top:1px solid var(--hairline);
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-title{font:500 13px/1.3 var(--ff-ui);letter-spacing:.01em;color:var(--ink)}
+.card-price{font:500 12px/1.3 var(--ff-ui);letter-spacing:.01em;color:rgba(18,16,14,.58)}
+
+/* expand clone: morphs from card thumb rect to fullscreen (FLIP-lite) */
+#expandClone{
+  position:absolute;
+  border-radius:12px;
+  overflow:hidden;
+  background-size:220% 220%;
+  filter:saturate(1.05);
+  opacity:0;
+  pointer-events:none;
+  animation:thumbPan 8s linear infinite, thumbPulse 8s ease-in-out infinite;
+  transition:
+    top .7s cubic-bezier(.16,1,.3,1),
+    left .7s cubic-bezier(.16,1,.3,1),
+    width .7s cubic-bezier(.16,1,.3,1),
+    height .7s cubic-bezier(.16,1,.3,1),
+    border-radius .7s cubic-bezier(.16,1,.3,1),
+    opacity .25s ease;
+  z-index:5;
+}
+#expandClone.is-active{opacity:1}
+
+.expand-info{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  padding:6% 6% 7%;
+  z-index:6;
+  opacity:0;
+  transition:opacity .35s ease;
+  pointer-events:none;
+  background:linear-gradient(0deg,rgba(18,16,14,.28),rgba(18,16,14,0) 70%);
+}
+.expand-info.is-visible{opacity:1}
+.expand-title{font:500 15px/1.3 var(--ff-ui);letter-spacing:.01em;color:#fff}
+.expand-price{font:500 13px/1.3 var(--ff-ui);letter-spacing:.01em;color:rgba(255,255,255,.82);margin-top:2px}
+
+/* bookings counter: vague, no badge, no color */
+.counter{
+  position:absolute;
+  right:5%;bottom:4%;
+  font:500 11px/1 var(--ff-ui);
+  letter-spacing:.01em;
+  color:rgba(18,16,14,.6);
+  opacity:0;
+  transition:opacity .4s ease;
+  z-index:4;
+}
+.counter.is-visible{opacity:1}
+
+/* ---------- END CARD ---------- */
+.endcard{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+}
+.endcard.is-visible{opacity:1}
+.endcard-logo{
+  font-family:var(--ff-display);
+  font-weight:700;
+  font-stretch:condensed;
+  font-size:clamp(1.8rem,4.4vw,2.6rem);
+  letter-spacing:-.01em;
+  color:var(--ink);
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.endcard-logo span{color:var(--leather)}
+.endcard-claim{
+  font:500 15px/1.5 var(--ff-ui);
+  letter-spacing:.01em;
+  color:rgba(18,16,14,.72);
+  max-width:420px;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .5s ease .15s, transform .5s ease .15s;
+}
+.endcard-cta{
+  font:700 13px/1 var(--ff-display);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--leather);
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .5s ease .3s, transform .5s ease .3s;
+}
+.endcard.is-visible .endcard-logo,
+.endcard.is-visible .endcard-claim,
+.endcard.is-visible .endcard-cta{opacity:1;transform:none}
+
+/* ---------- BLACKOUT (loop seam) ---------- */
+.blackout{
+  position:absolute;inset:0;
+  background:#000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+  z-index:20;
+  border-radius:18px;
+}
+
+/* ---------- REDUCED MOTION: kill continuous motion, keep only 400ms crossfades ---------- */
+.reduce-motion .thumb,
+.reduce-motion #expandClone,
+.reduce-motion .device{transition:none !important;animation:none !important}
+.reduce-motion .thumb.is-live{filter:saturate(1.05)}
+.reduce-motion .expand-info,
+.reduce-motion .counter,
+.reduce-motion .endcard-logo,
+.reduce-motion .endcard-claim,
+.reduce-motion .endcard-cta{transition:opacity .4s ease !important;transform:none !important}
+.reduce-motion .endcard{transition:opacity .4s ease}
+
+/* ---------- CONTROLS (review bar, not part of the spot) ---------- */
+.controls{
+  display:flex;align-items:center;gap:16px;
+  width:900px;max-width:92vw;
+  color:rgba(18,16,14,.5);
+  font:500 12px/1 var(--ff-ui);
+}
+#playBtn{
+  flex:0 0 auto;
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1px solid var(--hairline);
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:var(--ink);
+}
+.scrubber{
+  position:relative;
+  flex:1;height:24px;
+  display:flex;align-items:center;
+  cursor:pointer;
+}
+.scrubber-track{
+  position:absolute;left:0;right:0;top:50%;
+  height:1px;
+  background:var(--hairline);
+  transform:translateY(-50%);
+}
+.scrubber-fill{
+  position:absolute;left:0;top:50%;
+  height:1px;
+  background:var(--leather);
+  transform:translateY(-50%);
+  width:0%;
+}
+.scrubber-markers{position:absolute;inset:0}
+.scrubber-marker{
+  position:absolute;top:50%;
+  width:3px;height:3px;border-radius:50%;
+  background:rgba(18,16,14,.28);
+  transform:translate(-50%,-50%);
+}
+.scrubber-handle{
+  position:absolute;top:50%;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--ink);
+  transform:translate(-50%,-50%);
+  left:0%;
+}
+.timecode{flex:0 0 auto;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+@media (max-width:720px){
+  .device{border-width:7px;border-radius:20px}
+  .controls{gap:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <div class="device" id="device">
+    <div class="device-inner" id="deviceInner">
+
+      <div class="topbar">
+        <div class="search-field">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span>Langhe, Piemonte</span>
+        </div>
+        <button class="filter-btn" aria-hidden="true" tabindex="-1">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M4 7h6M5.5 10h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="grid-viewport">
+        <div class="grid" id="grid">
+          <!-- 0 -->
+          <div class="card" data-idx="0">
+            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Cascina del Bosco</div><div class="card-price">€140 / notte</div></div>
+          </div>
+          <!-- 1 (live, phase 2) -->
+          <div class="card" data-idx="1">
+            <div class="thumb" data-palette="olive"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Loggia San Michele</div><div class="card-price">€190 / notte</div></div>
+          </div>
+          <!-- 2 -->
+          <div class="card" data-idx="2">
+            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Rifugio delle Vigne</div><div class="card-price">€120 / notte</div></div>
+          </div>
+          <!-- 3 -->
+          <div class="card" data-idx="3">
+            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Casa del Fico</div><div class="card-price">€105 / notte</div></div>
+          </div>
+          <!-- 4 BEAT CARD -->
+          <div class="card" data-idx="4" id="beatCard">
+            <div class="thumb" data-palette="olive" id="beatThumb"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Cascina Rovere</div><div class="card-price">€165 / notte</div></div>
+          </div>
+          <!-- 5 -->
+          <div class="card" data-idx="5">
+            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Suite sui Vigneti</div><div class="card-price">€225 / notte</div></div>
+          </div>
+          <!-- 6 -->
+          <div class="card" data-idx="6">
+            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Antico Frantoio</div><div class="card-price">€135 / notte</div></div>
+          </div>
+          <!-- 7 (live, phase 2) -->
+          <div class="card" data-idx="7">
+            <div class="thumb" data-palette="olive"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Terrazza dei Noccioli</div><div class="card-price">€210 / notte</div></div>
+          </div>
+          <!-- 8 -->
+          <div class="card" data-idx="8">
+            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Cascina Bellavista</div><div class="card-price">€98 / notte</div></div>
+          </div>
+          <!-- 9 -->
+          <div class="card" data-idx="9">
+            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Dimora delle Langhe</div><div class="card-price">€240 / notte</div></div>
+          </div>
+          <!-- 10 -->
+          <div class="card" data-idx="10">
+            <div class="thumb" data-palette="olive"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Casale del Tartufo</div><div class="card-price">€150 / notte</div></div>
+          </div>
+          <!-- 11 -->
+          <div class="card" data-idx="11">
+            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="card-info"><div class="card-title">Nido tra i Filari</div><div class="card-price">€112 / notte</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="expandClone" data-palette="olive"><!-- SWAP: video finale qui --></div>
+      <div class="expand-info" id="expandInfo">
+        <div class="expand-title">Cascina Rovere</div>
+        <div class="expand-price">€165 / notte</div>
+      </div>
+
+      <div class="counter" id="counter"><span id="counterNum">0</span> nuove prenotazioni</div>
+
+    </div>
+  </div>
+
+  <div class="endcard" id="endcard">
+    <div class="endcard-logo">Vista <span>BnB</span></div>
+    <div class="endcard-claim">Il tuo annuncio smette di stare fermo.</div>
+    <div class="endcard-cta">vistabnb.it</div>
+  </div>
+
+  <div class="blackout" id="blackout"></div>
+</div>
+
+<div class="controls">
+  <button id="playBtn" aria-label="Play/pausa">
+    <svg id="playIcon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5V1z"/></svg>
+    <svg id="pauseIcon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style="display:none"><rect x="2" y="1" width="3" height="10"/><rect x="7" y="1" width="3" height="10"/></svg>
+  </button>
+  <div class="scrubber" id="scrubber">
+    <div class="scrubber-track"></div>
+    <div class="scrubber-fill" id="scrubberFill"></div>
+    <div class="scrubber-markers" id="scrubberMarkers"></div>
+    <div class="scrubber-handle" id="scrubberHandle"></div>
+  </div>
+  <div class="timecode" id="timecode">0.0s / 18.0s</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CONTENT_DURATION = 18.0;
+  var CYCLE = 19.0; // 18s content + 1s black
+  var KEYFRAMES = [0, 3.0, 3.6, 5.0, 5.4, 9.0, 13.0, 15.0, 18.0];
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- DOM refs ----
+  var grid = document.getElementById('grid');
+  var beatCard = document.getElementById('beatCard');
+  var beatThumb = document.getElementById('beatThumb');
+  var deviceInner = document.getElementById('deviceInner');
+  var device = document.getElementById('device');
+  var expandClone = document.getElementById('expandClone');
+  var expandInfo = document.getElementById('expandInfo');
+  var counter = document.getElementById('counter');
+  var counterNum = document.getElementById('counterNum');
+  var endcard = document.getElementById('endcard');
+  var blackout = document.getElementById('blackout');
+  var scene = document.getElementById('scene');
+
+  var liveCard1 = document.querySelector('.card[data-idx="1"] .thumb');
+  var liveCard7 = document.querySelector('.card[data-idx="7"] .thumb');
+
+  var playBtn = document.getElementById('playBtn');
+  var playIcon = document.getElementById('playIcon');
+  var pauseIcon = document.getElementById('pauseIcon');
+  var scrubber = document.getElementById('scrubber');
+  var scrubberFill = document.getElementById('scrubberFill');
+  var scrubberHandle = document.getElementById('scrubberHandle');
+  var scrubberMarkers = document.getElementById('scrubberMarkers');
+  var timecodeEl = document.getElementById('timecode');
+
+  // ---- easing ----
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
+  function easeOutQuint(t){ return 1 - Math.pow(1 - t, 5); }
+
+  // ==================================================================
+  // FULL-MOTION RENDERER
+  // ==================================================================
+  // NOTE: top/left/width/height are always set as inline styles (never via
+  // a CSS class) in BOTH the captured and expanded states. An inline style
+  // has higher specificity than any class rule, so if the target size were
+  // defined in a stylesheet class instead, it would never win over the
+  // inline start values — the clone would stay pinned at its captured rect.
+  var expandPhase = 'idle'; // idle -> in -> full -> out -> (idle)
+  var capturedRect = null;
+
+  function enterExpandIn(instant){
+    var cardRect = beatThumb.getBoundingClientRect();
+    var deviceRect = deviceInner.getBoundingClientRect();
+    capturedRect = {
+      top: (cardRect.top - deviceRect.top) + 'px',
+      left: (cardRect.left - deviceRect.left) + 'px',
+      width: cardRect.width + 'px',
+      height: cardRect.height + 'px'
+    };
+    expandClone.style.transition = 'none';
+    expandClone.style.top = capturedRect.top;
+    expandClone.style.left = capturedRect.left;
+    expandClone.style.width = capturedRect.width;
+    expandClone.style.height = capturedRect.height;
+    expandClone.style.borderRadius = '12px';
+    expandClone.classList.add('is-active');
+    void expandClone.offsetWidth; // force reflow: register start rect before animating
+    if (!instant) expandClone.style.transition = '';
+    expandClone.style.top = '0px';
+    expandClone.style.left = '0px';
+    expandClone.style.width = deviceInner.clientWidth + 'px';
+    expandClone.style.height = deviceInner.clientHeight + 'px';
+    expandClone.style.borderRadius = '0px';
+    expandPhase = instant ? 'full' : 'in';
+  }
+
+  function enterExpandOut(){
+    expandInfo.classList.remove('is-visible');
+    if (capturedRect) {
+      expandClone.style.top = capturedRect.top;
+      expandClone.style.left = capturedRect.left;
+      expandClone.style.width = capturedRect.width;
+      expandClone.style.height = capturedRect.height;
+      expandClone.style.borderRadius = '12px';
+    }
+    expandPhase = 'out';
+  }
+
+  function resetExpand(){
+    expandPhase = 'idle';
+    capturedRect = null;
+    expandClone.classList.remove('is-active');
+    expandClone.style.transition = 'none';
+    expandInfo.classList.remove('is-visible');
+    requestAnimationFrame(function(){ expandClone.style.transition = ''; });
+  }
+
+  function render(t){
+    // ---- 1. grid scroll (0 -> 3.0 -> 3.6 -> 5.0 -> 5.4) ----
+    var scrollPx;
+    if (t < 3.0) {
+      scrollPx = lerp(0, 570, t / 3.0);
+    } else if (t < 3.6) {
+      scrollPx = lerp(570, 600, easeOutQuint((t - 3.0) / 0.6));
+    } else if (t < 5.0) {
+      scrollPx = 600;
+    } else if (t < 5.4) {
+      scrollPx = lerp(600, 576, easeOutQuint((t - 5.0) / 0.4));
+    } else {
+      scrollPx = 576;
+    }
+    grid.style.transform = 'translateY(' + (-scrollPx) + 'px)';
+
+    // ---- 2. the beat: single card goes live at 3.6s ----
+    var beatLive = t >= 3.6;
+    beatThumb.classList.toggle('is-live', beatLive);
+
+    // ---- 3. expand morph (5.4 -> 9.0) ----
+    if (t >= 5.4 && t < 9.0) {
+      if (expandPhase === 'idle') enterExpandIn(false);
+      if (t >= 6.1 && t < 8.3 && expandPhase !== 'full') {
+        expandPhase = 'full';
+        expandInfo.classList.add('is-visible');
+      } else if (t >= 8.3 && expandPhase !== 'out') {
+        enterExpandOut();
+      }
+    } else if (expandPhase !== 'idle') {
+      resetExpand();
+    }
+
+    // ---- 4. return to grid, 3 cards live, counter (9.0 -> 13.0) ----
+    var threeLivePhase = t >= 9.0 && t < 13.0;
+    if (liveCard1) liveCard1.classList.toggle('is-live', threeLivePhase);
+    if (liveCard7) liveCard7.classList.toggle('is-live', threeLivePhase);
+    // beat card stays live continuously once triggered at 3.6s, all the way through this phase
+    beatThumb.classList.toggle('is-live', t >= 3.6);
+
+    counter.classList.toggle('is-visible', threeLivePhase);
+    if (threeLivePhase) {
+      var cp = clamp01((t - 9.0) / 2.0);
+      counterNum.textContent = Math.round(lerp(0, 3, cp));
+    }
+
+    // ---- 5. device dissolves (13.0 -> 15.0) ----
+    var deviceOpacity, deviceScale;
+    if (t < 13.0) {
+      deviceOpacity = 1; deviceScale = 1;
+    } else if (t < 15.0) {
+      var dp = (t - 13.0) / 2.0;
+      deviceOpacity = 1 - dp;
+      deviceScale = 1 - 0.02 * dp;
+    } else {
+      deviceOpacity = 0; deviceScale = 0.98;
+    }
+    device.style.opacity = deviceOpacity;
+    device.style.transform = 'scale(' + deviceScale + ')';
+
+    // ---- 6. end card (15.0 -> 18.0) ----
+    endcard.classList.toggle('is-visible', t >= 15.0);
+  }
+
+  // ==================================================================
+  // REDUCED MOTION RENDERER — 5 static states, 400ms crossfade
+  // ==================================================================
+  var rmStates = [
+    { from: 0.0, to: 3.6 },   // grid static
+    { from: 3.6, to: 5.4 },   // beat card live
+    { from: 5.4, to: 9.0 },   // fullscreen
+    { from: 9.0, to: 15.0 },  // grid, 3 live + counter
+    { from: 15.0, to: 18.0 }  // end card
+  ];
+
+  function renderReduced(t){
+    var idx = rmStates.length - 1;
+    for (var i = 0; i < rmStates.length; i++) {
+      if (t >= rmStates[i].from && t < rmStates[i].to) { idx = i; break; }
+    }
+    switch (idx) {
+      case 0:
+        grid.style.transform = 'translateY(-600px)';
+        beatThumb.classList.remove('is-live');
+        if (liveCard1) liveCard1.classList.remove('is-live');
+        if (liveCard7) liveCard7.classList.remove('is-live');
+        counter.classList.remove('is-visible');
+        expandClone.classList.remove('is-active');
+        endcard.classList.remove('is-visible');
+        device.style.opacity = 1; device.style.transform = 'scale(1)';
+        break;
+      case 1:
+        beatThumb.classList.add('is-live');
+        break;
+      case 2:
+        if (expandPhase === 'idle') { enterExpandIn(true); expandInfo.classList.add('is-visible'); }
+        break;
+      case 3:
+        if (expandPhase !== 'idle') resetExpand();
+        beatThumb.classList.add('is-live');
+        if (liveCard1) liveCard1.classList.add('is-live');
+        if (liveCard7) liveCard7.classList.add('is-live');
+        counter.classList.add('is-visible');
+        counterNum.textContent = '3';
+        break;
+      case 4:
+        device.style.opacity = 0;
+        endcard.classList.add('is-visible');
+        break;
+    }
+  }
+
+  // ==================================================================
+  // TIMELINE DRIVER
+  // ==================================================================
+  var playing = true;
+  var elapsed = 0;
+  var lastFrameTime = null;
+
+  function setBlack(on){
+    blackout.style.opacity = on ? 1 : 0;
+  }
+
+  function tick(now){
+    if (lastFrameTime === null) lastFrameTime = now;
+    var dt = (now - lastFrameTime) / 1000;
+    lastFrameTime = now;
+
+    if (playing) {
+      elapsed = (elapsed + dt) % CYCLE;
+      if (elapsed < dt) {
+        // wrapped: hard reset all one-shot state
+        if (expandPhase !== 'idle') resetExpand();
+      }
+    }
+
+    if (elapsed < CONTENT_DURATION) {
+      setBlack(false);
+      if (reduceMotion) renderReduced(elapsed); else render(elapsed);
+    } else {
+      setBlack(true);
+    }
+
+    updateScrubber(elapsed);
+    requestAnimationFrame(tick);
+  }
+
+  // ==================================================================
+  // CONTROLS
+  // ==================================================================
+  function updateScrubber(t){
+    var pct = (t / CYCLE) * 100;
+    scrubberFill.style.width = pct + '%';
+    scrubberHandle.style.left = pct + '%';
+    var shown = Math.min(t, CONTENT_DURATION);
+    timecodeEl.textContent = shown.toFixed(1) + 's / ' + CONTENT_DURATION.toFixed(1) + 's';
+  }
+
+  KEYFRAMES.forEach(function(kt){
+    var m = document.createElement('div');
+    m.className = 'scrubber-marker';
+    m.style.left = ((kt / CYCLE) * 100) + '%';
+    scrubberMarkers.appendChild(m);
+  });
+
+  playBtn.addEventListener('click', function(){
+    playing = !playing;
+    playIcon.style.display = playing ? 'none' : 'block';
+    pauseIcon.style.display = playing ? 'block' : 'none';
+    lastFrameTime = null;
+  });
+
+  function seekFromEvent(e){
+    var rect = scrubber.getBoundingClientRect();
+    var clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+    var pct = clamp01((clientX - rect.left) / rect.width);
+    elapsed = pct * CYCLE;
+    if (expandPhase !== 'idle') resetExpand();
+    if (elapsed < CONTENT_DURATION) {
+      setBlack(false);
+      if (reduceMotion) renderReduced(elapsed); else render(elapsed);
+    } else {
+      setBlack(true);
+    }
+    updateScrubber(elapsed);
+  }
+
+  var dragging = false;
+  scrubber.addEventListener('pointerdown', function(e){
+    dragging = true;
+    playing = false;
+    playIcon.style.display = 'block';
+    pauseIcon.style.display = 'none';
+    seekFromEvent(e);
+  });
+  window.addEventListener('pointermove', function(e){ if (dragging) seekFromEvent(e); });
+  window.addEventListener('pointerup', function(){ dragging = false; });
+
+  // init
+  if (reduceMotion) scene.classList.add('reduce-motion');
+  playIcon.style.display = 'none';
+  pauseIcon.style.display = 'block';
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
