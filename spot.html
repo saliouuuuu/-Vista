@@ -13,8 +13,13 @@
   --paper:#F2EDE6;
   --ink:#12100E;
   --leather:#8A6A4B;
+  --champagne:#E3C793;
   --glass:rgba(255,255,255,0.08);
   --hairline:rgba(18,16,14,0.10);
+  --dev-bg:#131110;
+  --dev-ink:#F3EEE6;
+  --dev-ink-2:rgba(243,238,230,.6);
+  --dev-line:rgba(255,255,255,.08);
   --ff-display:'Archivo',system-ui,sans-serif;
   --ff-ui:'Inter',system-ui,sans-serif;
 }
@@ -38,16 +43,39 @@ body{
 /* ---------- SCENE ---------- */
 .scene{position:relative;width:900px;max-width:92vw}
 
+/* perspective lives on the stage (ancestor), never on .device itself —
+   this lets .device's own transform stay a clean rotateX/rotateY/scale
+   list, so browsers can interpolate it smoothly on transition. */
+.device-stage{perspective:1500px;perspective-origin:50% 38%}
+
 .device{
   position:relative;
   width:100%;
   aspect-ratio:4/3;
   border-radius:28px;
-  border:10px solid var(--ink);
-  box-shadow:0 40px 80px -20px rgba(18,16,14,0.28);
-  background:#fff;
+  border:10px solid #0B0A09;
+  box-shadow:
+    0 70px 110px -35px rgba(0,0,0,.55),
+    0 24px 50px -20px rgba(0,0,0,.4),
+    0 0 0 1px rgba(255,255,255,.03) inset;
+  background:var(--dev-bg);
   overflow:hidden;
-  transform-origin:center center;
+  transform-style:preserve-3d;
+  transform:rotateX(7deg) rotateY(-9deg) scale(.965);
+  transition:transform .95s cubic-bezier(.16,1,.3,1), opacity .5s ease;
+}
+.device.is-flat{transform:rotateX(0deg) rotateY(0deg) scale(1)}
+/* soft diagonal glass sheen, Apple-hero-shot style */
+.device::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(115deg,
+    rgba(255,255,255,.07) 0%,
+    rgba(255,255,255,0) 26%,
+    rgba(255,255,255,0) 72%,
+    rgba(255,255,255,.05) 100%);
+  pointer-events:none;
+  z-index:9;
 }
 .device-inner{position:absolute;inset:0;display:flex;flex-direction:column}
 
@@ -60,22 +88,22 @@ body{
   align-items:center;
   justify-content:space-between;
   padding:0 5%;
-  border-bottom:1px solid var(--hairline);
+  border-bottom:1px solid var(--dev-line);
 }
 .search-field{
   display:flex;align-items:center;gap:8px;
   font:500 13px/1 var(--ff-ui);
   letter-spacing:.01em;
-  color:var(--ink);
-  opacity:.82;
+  color:var(--dev-ink);
+  opacity:.85;
 }
-.search-field svg{flex:0 0 auto;opacity:.55}
+.search-field svg{flex:0 0 auto;opacity:.55;color:var(--dev-ink-2)}
 .filter-btn{
   width:30px;height:30px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--hairline);background:transparent;
+  border:1px solid var(--dev-line);background:rgba(255,255,255,.03);
 }
-.filter-btn svg{opacity:.55}
+.filter-btn svg{opacity:.6;color:var(--dev-ink-2)}
 
 /* scrollable listing grid */
 .grid-viewport{position:relative;flex:1;overflow:hidden}
@@ -93,55 +121,56 @@ body{
   position:relative;
   aspect-ratio:16/10;
   border-radius:12px;
-  background-size:220% 220%;
-  background-position:0% 0%;
-  filter:saturate(.55);
-  transition:filter .5s ease;
+  background-size:cover;
+  background-position:50% 45%;
+  border:1px solid var(--dev-line);
+  box-shadow:0 0 0 0 rgba(227,199,147,0);
+  filter:saturate(.4) brightness(.8) contrast(.96);
+  transition:filter .5s ease, box-shadow .5s ease, border-color .5s ease;
 }
-.thumb[data-palette="stone"],#expandClone[data-palette="stone"]{background-image:linear-gradient(135deg,#a89c8a,#cfc6b6 45%,#8f8672)}
-.thumb[data-palette="olive"],#expandClone[data-palette="olive"]{background-image:linear-gradient(135deg,#8a8f6d,#bcc296 45%,#6f7456)}
-.thumb[data-palette="sand"],#expandClone[data-palette="sand"]{background-image:linear-gradient(135deg,#c9ad84,#e6d0a8 45%,#a9835c)}
 .thumb.is-live{
-  filter:saturate(1.05);
-  animation:thumbPan 8s linear infinite, thumbPulse 8s ease-in-out infinite;
+  filter:saturate(1.08) brightness(1) contrast(1.04);
+  border-color:rgba(227,199,147,.55);
+  box-shadow:0 0 0 1px rgba(227,199,147,.4) inset, 0 10px 34px -12px rgba(227,199,147,.4);
+  animation:thumbPan 9s ease-in-out infinite, thumbPulse 9s ease-in-out infinite;
 }
 @keyframes thumbPan{
-  0%{background-position:0% 0%}
-  50%{background-position:100% 60%}
-  100%{background-position:0% 0%}
+  0%,100%{background-position:48% 42%}
+  50%{background-position:54% 50%}
 }
 @keyframes thumbPulse{
   0%,100%{transform:scale(1)}
-  50%{transform:scale(1.04)}
+  50%{transform:scale(1.03)}
 }
 .card-info{
   padding-top:8px;
-  border-top:1px solid var(--hairline);
+  border-top:1px solid var(--dev-line);
   display:flex;flex-direction:column;gap:3px;
 }
-.card-title{font:500 13px/1.3 var(--ff-ui);letter-spacing:.01em;color:var(--ink)}
-.card-price{font:500 12px/1.3 var(--ff-ui);letter-spacing:.01em;color:rgba(18,16,14,.58)}
+.card-title{font:500 13px/1.3 var(--ff-ui);letter-spacing:.01em;color:var(--dev-ink)}
+.card-price{font:500 12px/1.3 var(--ff-ui);letter-spacing:.01em;color:var(--dev-ink-2)}
 
-/* expand clone: morphs from card thumb rect to fullscreen (FLIP-lite) */
+/* expand clone: morphs from card thumb rect to fullscreen (FLIP-lite),
+   holds the real hero-interior.mp4 clip — a genuine photo->video swap,
+   not a simulated one. */
 #expandClone{
   position:absolute;
-  border-radius:12px;
   overflow:hidden;
-  background-size:220% 220%;
-  filter:saturate(1.05);
+  border:1px solid var(--dev-line);
+  box-shadow:0 0 0 1px rgba(227,199,147,.35) inset;
   opacity:0;
   pointer-events:none;
-  animation:thumbPan 8s linear infinite, thumbPulse 8s ease-in-out infinite;
   transition:
-    top .7s cubic-bezier(.16,1,.3,1),
-    left .7s cubic-bezier(.16,1,.3,1),
-    width .7s cubic-bezier(.16,1,.3,1),
-    height .7s cubic-bezier(.16,1,.3,1),
-    border-radius .7s cubic-bezier(.16,1,.3,1),
-    opacity .25s ease;
+    top .8s cubic-bezier(.16,1,.3,1),
+    left .8s cubic-bezier(.16,1,.3,1),
+    width .8s cubic-bezier(.16,1,.3,1),
+    height .8s cubic-bezier(.16,1,.3,1),
+    border-radius .8s cubic-bezier(.16,1,.3,1),
+    opacity .3s ease;
   z-index:5;
 }
 #expandClone.is-active{opacity:1}
+#expandVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--dev-bg)}
 
 .expand-info{
   position:absolute;
@@ -151,24 +180,57 @@ body{
   opacity:0;
   transition:opacity .35s ease;
   pointer-events:none;
-  background:linear-gradient(0deg,rgba(18,16,14,.28),rgba(18,16,14,0) 70%);
+  background:linear-gradient(0deg,rgba(0,0,0,.5),rgba(0,0,0,0) 70%);
 }
 .expand-info.is-visible{opacity:1}
 .expand-title{font:500 15px/1.3 var(--ff-ui);letter-spacing:.01em;color:#fff}
 .expand-price{font:500 13px/1.3 var(--ff-ui);letter-spacing:.01em;color:rgba(255,255,255,.82);margin-top:2px}
 
-/* bookings counter: vague, no badge, no color */
+/* bookings counter: vague number, no badge — glows champagne on increment */
 .counter{
   position:absolute;
   right:5%;bottom:4%;
-  font:500 11px/1 var(--ff-ui);
-  letter-spacing:.01em;
-  color:rgba(18,16,14,.6);
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
   opacity:0;
   transition:opacity .4s ease;
   z-index:4;
 }
 .counter.is-visible{opacity:1}
+.counter-num{
+  font:700 22px/1 var(--ff-display);
+  letter-spacing:-.01em;
+  color:var(--champagne);
+  display:inline-block;
+}
+.counter-num.pulse{animation:counterGlow .5s ease}
+@keyframes counterGlow{
+  0%{text-shadow:0 0 0 rgba(227,199,147,0);transform:scale(1)}
+  40%{text-shadow:0 0 18px rgba(227,199,147,.85);transform:scale(1.16)}
+  100%{text-shadow:0 0 0 rgba(227,199,147,0);transform:scale(1)}
+}
+.counter-label{
+  font:500 10px/1 var(--ff-ui);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dev-ink-2);
+}
+
+/* caption beneath the device: institutional tone, wide tracking.
+   Positioned absolutely (not in normal flow) so it doesn't grow .scene's
+   box height, which would otherwise stretch .endcard's inset:0 sizing. */
+.caption{
+  position:absolute;
+  left:0;right:0;top:100%;
+  margin-top:22px;
+  text-align:center;
+  font:500 12px/1.4 var(--ff-ui);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(18,16,14,.55);
+  opacity:0;
+  transition:opacity .6s ease;
+}
+.caption.is-visible{opacity:1}
 
 /* ---------- END CARD ---------- */
 .endcard{
@@ -227,10 +289,12 @@ body{
 /* ---------- REDUCED MOTION: kill continuous motion, keep only 400ms crossfades ---------- */
 .reduce-motion .thumb,
 .reduce-motion #expandClone,
-.reduce-motion .device{transition:none !important;animation:none !important}
-.reduce-motion .thumb.is-live{filter:saturate(1.05)}
+.reduce-motion .device,
+.reduce-motion .counter-num{transition:none !important;animation:none !important}
+.reduce-motion .thumb.is-live{filter:saturate(1.08) brightness(1) contrast(1.04)}
 .reduce-motion .expand-info,
 .reduce-motion .counter,
+.reduce-motion .caption,
 .reduce-motion .endcard-logo,
 .reduce-motion .endcard-claim,
 .reduce-motion .endcard-cta{transition:opacity .4s ease !important;transform:none !important}
@@ -297,6 +361,7 @@ body{
 <body>
 
 <div class="scene" id="scene">
+  <div class="device-stage">
   <div class="device" id="device">
     <div class="device-inner" id="deviceInner">
 
@@ -314,77 +379,89 @@ body{
         <div class="grid" id="grid">
           <!-- 0 -->
           <div class="card" data-idx="0">
-            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-1.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Cascina del Bosco</div><div class="card-price">€140 / notte</div></div>
           </div>
           <!-- 1 (live, phase 2) -->
           <div class="card" data-idx="1">
-            <div class="thumb" data-palette="olive"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-2.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Loggia San Michele</div><div class="card-price">€190 / notte</div></div>
           </div>
           <!-- 2 -->
           <div class="card" data-idx="2">
-            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-3.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Rifugio delle Vigne</div><div class="card-price">€120 / notte</div></div>
           </div>
           <!-- 3 -->
           <div class="card" data-idx="3">
-            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-4.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Casa del Fico</div><div class="card-price">€105 / notte</div></div>
           </div>
-          <!-- 4 BEAT CARD -->
+          <!-- 4 BEAT CARD — grid thumb is still a static photo; the real
+               video only plays in the fullscreen expand (see #expandVideo) -->
           <div class="card" data-idx="4" id="beatCard">
-            <div class="thumb" data-palette="olive" id="beatThumb"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" id="beatThumb" style="background-image:url('images/hero-interior.jpg')"><!-- grid thumb: static poster frame --></div>
             <div class="card-info"><div class="card-title">Cascina Rovere</div><div class="card-price">€165 / notte</div></div>
           </div>
           <!-- 5 -->
           <div class="card" data-idx="5">
-            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/hero-house.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Suite sui Vigneti</div><div class="card-price">€225 / notte</div></div>
           </div>
           <!-- 6 -->
           <div class="card" data-idx="6">
-            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-1.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Antico Frantoio</div><div class="card-price">€135 / notte</div></div>
           </div>
           <!-- 7 (live, phase 2) -->
           <div class="card" data-idx="7">
-            <div class="thumb" data-palette="olive"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-2.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Terrazza dei Noccioli</div><div class="card-price">€210 / notte</div></div>
           </div>
           <!-- 8 -->
           <div class="card" data-idx="8">
-            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-3.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Cascina Bellavista</div><div class="card-price">€98 / notte</div></div>
           </div>
           <!-- 9 -->
           <div class="card" data-idx="9">
-            <div class="thumb" data-palette="stone"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/hero-house.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Dimora delle Langhe</div><div class="card-price">€240 / notte</div></div>
           </div>
           <!-- 10 -->
           <div class="card" data-idx="10">
-            <div class="thumb" data-palette="olive"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/thumb-4.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Casale del Tartufo</div><div class="card-price">€150 / notte</div></div>
           </div>
           <!-- 11 -->
           <div class="card" data-idx="11">
-            <div class="thumb" data-palette="sand"><!-- SWAP: video finale qui --></div>
+            <div class="thumb" style="background-image:url('images/hero-interior.jpg')"><!-- SWAP: video finale qui --></div>
             <div class="card-info"><div class="card-title">Nido tra i Filari</div><div class="card-price">€112 / notte</div></div>
           </div>
         </div>
       </div>
 
-      <div id="expandClone" data-palette="olive"><!-- SWAP: video finale qui --></div>
+      <!-- real footage: same clip already used for the site's own hero -->
+      <div id="expandClone">
+        <video id="expandVideo" muted loop playsinline preload="metadata" poster="images/hero-interior.jpg">
+          <source src="images/hero-interior.mp4" type="video/mp4">
+        </video>
+      </div>
       <div class="expand-info" id="expandInfo">
         <div class="expand-title">Cascina Rovere</div>
         <div class="expand-price">€165 / notte</div>
       </div>
 
-      <div class="counter" id="counter"><span id="counterNum">0</span> nuove prenotazioni</div>
+      <div class="counter" id="counter">
+        <span class="counter-num" id="counterNum">0</span>
+        <span class="counter-label">Nuove prenotazioni</span>
+      </div>
 
     </div>
   </div>
+  </div>
+
+  <div class="caption" id="caption">Non è una foto. È quello che vedranno prima di prenotare.</div>
 
   <div class="endcard" id="endcard">
     <div class="endcard-logo">Vista <span>BnB</span></div>
@@ -426,12 +503,23 @@ body{
   var deviceInner = document.getElementById('deviceInner');
   var device = document.getElementById('device');
   var expandClone = document.getElementById('expandClone');
+  var expandVideo = document.getElementById('expandVideo');
   var expandInfo = document.getElementById('expandInfo');
   var counter = document.getElementById('counter');
   var counterNum = document.getElementById('counterNum');
+  var caption = document.getElementById('caption');
   var endcard = document.getElementById('endcard');
   var blackout = document.getElementById('blackout');
   var scene = document.getElementById('scene');
+
+  function playExpandVideo(){
+    var p = expandVideo.play();
+    if (p && p.catch) p.catch(function(){});
+  }
+  function stopExpandVideo(){
+    expandVideo.pause();
+    try { expandVideo.currentTime = 0; } catch (e) {}
+  }
 
   var liveCard1 = document.querySelector('.card[data-idx="1"] .thumb');
   var liveCard7 = document.querySelector('.card[data-idx="7"] .thumb');
@@ -460,6 +548,7 @@ body{
   // inline start values — the clone would stay pinned at its captured rect.
   var expandPhase = 'idle'; // idle -> in -> full -> out -> (idle)
   var capturedRect = null;
+  var lastCounterVal = -1;
 
   function enterExpandIn(instant){
     var cardRect = beatThumb.getBoundingClientRect();
@@ -489,6 +578,7 @@ body{
 
   function enterExpandOut(){
     expandInfo.classList.remove('is-visible');
+    stopExpandVideo();
     if (capturedRect) {
       expandClone.style.top = capturedRect.top;
       expandClone.style.left = capturedRect.left;
@@ -505,6 +595,7 @@ body{
     expandClone.classList.remove('is-active');
     expandClone.style.transition = 'none';
     expandInfo.classList.remove('is-visible');
+    stopExpandVideo();
     requestAnimationFrame(function(){ expandClone.style.transition = ''; });
   }
 
@@ -528,12 +619,14 @@ body{
     var beatLive = t >= 3.6;
     beatThumb.classList.toggle('is-live', beatLive);
 
-    // ---- 3. expand morph (5.4 -> 9.0) ----
+    // ---- 3. expand morph (5.4 -> 9.0) — tablet also flattens to camera here ----
+    device.classList.toggle('is-flat', t >= 5.4);
     if (t >= 5.4 && t < 9.0) {
       if (expandPhase === 'idle') enterExpandIn(false);
       if (t >= 6.1 && t < 8.3 && expandPhase !== 'full') {
         expandPhase = 'full';
         expandInfo.classList.add('is-visible');
+        playExpandVideo();
       } else if (t >= 8.3 && expandPhase !== 'out') {
         enterExpandOut();
       }
@@ -551,25 +644,40 @@ body{
     counter.classList.toggle('is-visible', threeLivePhase);
     if (threeLivePhase) {
       var cp = clamp01((t - 9.0) / 2.0);
-      counterNum.textContent = Math.round(lerp(0, 3, cp));
+      var cVal = Math.round(lerp(0, 3, cp));
+      if (cVal !== lastCounterVal) {
+        counterNum.textContent = cVal;
+        lastCounterVal = cVal;
+        counterNum.classList.remove('pulse');
+        void counterNum.offsetWidth; // force reflow so the animation can retrigger
+        counterNum.classList.add('pulse');
+      }
+    } else {
+      lastCounterVal = -1;
     }
 
-    // ---- 5. device dissolves (13.0 -> 15.0) ----
-    var deviceOpacity, deviceScale;
+    // ---- 5. device dissolves (13.0 -> 15.0). Tilt/flat is governed by the
+    // .is-flat CSS class (toggled in step 3); only touch the inline
+    // transform here, and only once dissolve starts — otherwise an inline
+    // style would permanently override the class's rotateX/rotateY, the
+    // same specificity trap fixed earlier for #expandClone. ----
+    var deviceOpacity;
     if (t < 13.0) {
-      deviceOpacity = 1; deviceScale = 1;
+      deviceOpacity = 1;
+      device.style.transform = '';
     } else if (t < 15.0) {
       var dp = (t - 13.0) / 2.0;
       deviceOpacity = 1 - dp;
-      deviceScale = 1 - 0.02 * dp;
+      device.style.transform = 'rotateX(0deg) rotateY(0deg) scale(' + (1 - 0.02 * dp) + ')';
     } else {
-      deviceOpacity = 0; deviceScale = 0.98;
+      deviceOpacity = 0;
+      device.style.transform = 'rotateX(0deg) rotateY(0deg) scale(0.98)';
     }
     device.style.opacity = deviceOpacity;
-    device.style.transform = 'scale(' + deviceScale + ')';
 
     // ---- 6. end card (15.0 -> 18.0) ----
     endcard.classList.toggle('is-visible', t >= 15.0);
+    caption.classList.toggle('is-visible', t >= 6.1 && t < 13.0);
   }
 
   // ==================================================================
@@ -595,26 +703,37 @@ body{
         if (liveCard1) liveCard1.classList.remove('is-live');
         if (liveCard7) liveCard7.classList.remove('is-live');
         counter.classList.remove('is-visible');
+        caption.classList.remove('is-visible');
         expandClone.classList.remove('is-active');
         endcard.classList.remove('is-visible');
-        device.style.opacity = 1; device.style.transform = 'scale(1)';
+        device.classList.remove('is-flat');
+        device.style.opacity = 1; device.style.transform = '';
         break;
       case 1:
         beatThumb.classList.add('is-live');
         break;
       case 2:
-        if (expandPhase === 'idle') { enterExpandIn(true); expandInfo.classList.add('is-visible'); }
+        device.classList.add('is-flat');
+        if (expandPhase === 'idle') {
+          enterExpandIn(true);
+          expandInfo.classList.add('is-visible');
+          playExpandVideo();
+        }
+        caption.classList.add('is-visible');
         break;
       case 3:
+        device.classList.add('is-flat');
         if (expandPhase !== 'idle') resetExpand();
         beatThumb.classList.add('is-live');
         if (liveCard1) liveCard1.classList.add('is-live');
         if (liveCard7) liveCard7.classList.add('is-live');
         counter.classList.add('is-visible');
         counterNum.textContent = '3';
+        caption.classList.add('is-visible');
         break;
       case 4:
         device.style.opacity = 0;
+        caption.classList.remove('is-visible');
         endcard.classList.add('is-visible');
         break;
     }
